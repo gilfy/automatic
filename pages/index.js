@@ -12,7 +12,7 @@ export default function Home() {
       const response = await fetch('/api/speak');
       if (response.ok) {
         const data = await response.json();
-        setVoices(data.voices); // Nehmen wir an, die Stimmen sind in `data.voices`
+        setVoices(data.voices);
         if (data.voices.length > 0) setVoice(data.voices[0].id);
       }
     };
@@ -42,25 +42,40 @@ export default function Home() {
   };
 
   return (
-    <div>
-      <h1>Text to Speech mit ElevenLabs</h1>
+    <div className="max-w-md mx-auto mt-10 p-5 border rounded shadow-lg">
+      <h1 className="text-2xl font-bold mb-4">Text to Speech mit ElevenLabs</h1>
       <textarea
+        className="w-full p-2 border rounded mb-4"
         value={text}
         onChange={e => setText(e.target.value)}
         placeholder="Geben Sie hier Ihren Text ein"
       ></textarea>
-      <select value={voice} onChange={e => setVoice(e.target.value)}>
+      <select
+        className="w-full p-2 border rounded mb-4"
+        value={voice}
+        onChange={e => setVoice(e.target.value)}
+      >
         {voices.map(v => (
           <option key={v.id} value={v.id}>
             {v.name}
           </option>
         ))}
       </select>
-      <button onClick={convertTextToSpeech}>Umwandeln</button>
+      <button
+        className="w-full bg-blue-500 text-white p-2 rounded mb-4 hover:bg-blue-600"
+        onClick={convertTextToSpeech}
+      >
+        Umwandeln
+      </button>
       
       {audioUrl && (
         <div>
-          <button onClick={handleConfirm}>Bestätigen und anhören</button>
+          <button 
+            className="w-full bg-green-500 text-white p-2 rounded mb-4 hover:bg-green-600"
+            onClick={handleConfirm}
+          >
+            Bestätigen und anhören
+          </button>
           {isConfirmed && <audio controls src={audioUrl}></audio>}
         </div>
       )}
