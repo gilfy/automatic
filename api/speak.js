@@ -19,7 +19,25 @@ export default async function handler(req, res) {
         res.status(500).json({ error: 'Interner Serverfehler' });
       }
     } else if (req.method === 'POST') {
-      // Vorherige POST-Logik für Text-to-Speech beibehalten
+      const { text, voice } = req.body;
+      const apiKey = process.env.ELEVENLABS_API_KEY;
+  
+      const response = await fetch('https://api.elevenlabs.io/synthesize', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify({ text, voice }),
+      });
+  
+      if (response.ok) {
+        const audioBuffer = await response.arrayBuffer();
+        res.setHeader('Content-Type', 'audio/mpeg');
+        res.send(Buffer.from(audioBuffer));
+      } else {
+        res.status(response.status).send(response.statusText);
+      }
     } else {
       res.setHeader('Allow', ['GET', 'POST']);
       res.status(405).end('Method Not Allowed');
