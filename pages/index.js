@@ -9,11 +9,18 @@ export default function Home() {
 
   useEffect(() => {
     const fetchVoices = async () => {
-      const response = await fetch('/api/speak');
-      if (response.ok) {
-        const data = await response.json();
-        setVoices(data.voices);
-        if (data.voices.length > 0) setVoice(data.voices[0].id);
+      try {
+        const response = await fetch('/api/speak');
+        if (response.ok) {
+          const data = await response.json();
+          console.log("Stimmen erhalten:", data.voices); // Überprüfen, ob Stimmen vorhanden sind
+          setVoices(data.voices || []);
+          if (data.voices.length > 0) setVoice(data.voices[0].id);
+        } else {
+          console.error('Fehler beim Laden der Stimmen');
+        }
+      } catch (error) {
+        console.error('Fehler beim Abrufen der Stimmen:', error);
       }
     };
     fetchVoices();
@@ -21,19 +28,23 @@ export default function Home() {
 
   const convertTextToSpeech = async () => {
     setIsConfirmed(false);
-    const response = await fetch('/api/speak', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ text, voice }),
-    });
+    try {
+      const response = await fetch('/api/speak', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ text, voice }),
+      });
 
-    if (response.ok) {
-      const blob = await response.blob();
-      setAudioUrl(URL.createObjectURL(blob));
-    } else {
-      console.error('Fehler bei der API-Anfrage:', response.statusText);
+      if (response.ok) {
+        const blob = await response.blob();
+        setAudioUrl(URL.createObjectURL(blob));
+      } else {
+        console.error('Fehler bei der Umwandlung');
+      }
+    } catch (error) {
+      console.error('Fehler bei der API-Anfrage:', error);
     }
   };
 
